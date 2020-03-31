@@ -5,6 +5,8 @@ module.exports = (sequelize, DataTypes) => {
     ProjectId: DataTypes.INTEGER
   }, {});
   ProjectUser.associate = function(models) {
+    ProjectUser.belongsTo(models.User)
+    ProjectUser.belongsTo(models.Project)
     // associations can be defined here
   };
   return ProjectUser;

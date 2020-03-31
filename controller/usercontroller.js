@@ -1,6 +1,7 @@
 const { User } = require('../models')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
+const Axios = require('axios')
 
 class UserController {
     static Register(req, res, next) {
@@ -37,11 +38,21 @@ class UserController {
     }
 
     static Login(req, res, next) {
-        User.findOne({
-            where: {
-                Email: req.body.Email
-            }
+        console.log('masuk login')
+        let geolocation = {}
+        Axios({
+            url: 'https://freegeoip.app/json/',
+            method: 'GET'
         })
+            .then(function(result) {
+                geolocation = result.data
+                console.log(geolocation)
+                return User.findOne({
+                    where: {
+                        Email: req.body.Email
+                    }
+                })
+            })
             .then(function(result) {
                 console.log(bcrypt.compareSync(req.body.Password, result.Password))
                 if(bcrypt.compareSync(req.body.Password, result.Password)) {
@@ -52,10 +63,10 @@ class UserController {
                     let Access_Token = jwt.sign(data, process.env.SECRET, { expiresIn: 60*60 })
                     let payload = {
                         Access_Token,
-                        Email: result.Email
+                        Email: result.Email,
+                        geolocation: geolocation
                     }
                     res.status(200).json(payload)
-
                 }
                 else {
                     let err = {
@@ -63,9 +74,6 @@ class UserController {
                     }
                     throw err
                 }
-                
-
-                
             })
             .catch(function(err) {
                 console.log(err)
