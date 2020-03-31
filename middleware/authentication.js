@@ -4,9 +4,11 @@ const {User} = require('../models')
 module.exports = function(req, res, next) {
     let Access_Token = req.header('Access_Token')
     let Authenticated = jwt.verify(Access_Token, process.env.SECRET)
+    console.log('masuk authentication')
+    console.log(Authenticated)
     User.findOne({
         where: {
-            Email: Authenticated.id
+            id: Authenticated.id
         }
     })
         .then(function(result) {

@@ -98,9 +98,46 @@ module.exports = function(err, req, res, next) {
                 break;
             case 'Must Have At Least 3 Characters': 
                 msg = {
+                    type: 'Bad Request',
                     message: 'Must Have At Least 3 Characters'
                 }
-                return res.status(400).msg
+                return res.status(400).json(msg)
+            case 'Data Not Found':
+                msg = {
+                    type: 'Bad Request',
+                    message: 'Data Not Found'
+                }
+                return res.status(400).json(msg);
+            case 'User Already Exist!!':
+                msg = {
+                    type: 'Method Not Allowed',
+                    message : 'User Already Exist!!'
+                }
+                return res.status(405).json(msg)
+            case 'User Does not Exist': 
+                msg = {
+                    type: 'Method Not Allowed',
+                    message : 'User Does not Exist!!'
+                }
+                return res.status(405).json(msg)
+                case 'Project Does Not Exist': 
+                msg = {
+                    type: 'Bad Request',
+                    message : 'Project Does not Exist!!'
+                }
+                return res.status(400).json(msg)
+            case 'Unauthorized':
+                msg = {
+                    type: 'Bad Request',
+                    message : 'Unauthorized'
+                }
+                return res.status(400).json(msg)
+            case 'Todo Does Not Exist': 
+                msg = {
+                    type: 'Bad Request',
+                    message : 'Todo Does Not Exist'
+                }
+                return res.status(400).json(msg)
             default:
                 msg = {
                     type: "Internal Server Error",

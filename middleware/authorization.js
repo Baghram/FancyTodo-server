@@ -3,11 +3,13 @@ const {ProjectUser} = require('../models')
 module.exports = function(req, res, next) {
     ProjectUser.findOne({
         where: {
-            UserId: req.Authenticated.id
+            UserId: req.Authenticated,
+            ProjectId: req.body.ProjectId
         }
     })
         .then(function(result) {
-            if(result) {
+            console.log(result, 'THIS IS AUTH')
+            if(result !== null) {
                 next()
             }
             else {

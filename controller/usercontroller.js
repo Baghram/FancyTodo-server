@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs')
 const Axios = require('axios')
 
 class UserController {
-    static Register(req, res, next) {
+    static Register(req, res, next) { //Done And Tested
         User.findOne({
             where: {
                 Email: req.body.Email
@@ -37,7 +37,7 @@ class UserController {
             })
     }
 
-    static Login(req, res, next) {
+    static Login(req, res, next) { //Done And Tested
         console.log('masuk login')
         let geolocation = {}
         Axios({

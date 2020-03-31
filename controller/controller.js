@@ -1,10 +1,10 @@
 const {ProjectUser, User, Project, Todo} = require('../models')
 
 class Controller {
-    static getProject(req, res, next) {
+    static getProject(req, res, next) { //Done & Tested
         ProjectUser.findAll({
             where: {
-                ProjectId: req.body.ProjectId
+                UserId: req.Authenticated
             },
             include: ['User', 'Project']
         })
@@ -16,7 +16,7 @@ class Controller {
             })
     }
 
-    static addProject(req, res, next) {
+    static addProject(req, res, next) { //Done And Tested
         let project;
         Project.create({
             UserId: req.Authenticated, // dari authentication
@@ -30,26 +30,45 @@ class Controller {
                 })
             })
             .then(function(result) {
-                return res.status(201).json({
-                    payload,
+                let payload = {
+                    msg: 'Add Project Success',
                     result
-                })
+                }
+                return res.status(201).json(payload)
+
             })
             .catch(function(err) {
                 next(err)
             })
     }
 
-    static deleteProject(req, res, next) {
-        ProjectUser.destroy({
+    static deleteProject(req, res, next) { //Done And Tested
+        let data;
+        Project.findOne({
             where: {
-                ProjectId: req.body.ProjectId
+                id: req.params.id
             }
         })
             .then(function(result) {
+                data = result
+                if(data) {
+                    return ProjectUser.destroy({
+                        where: {
+                            ProjectId: data.id
+                        }
+                    })    
+                }
+                else {
+                    let err = {
+                        msg: 'Data Not Found'
+                    }
+                    throw err
+                }
+            })        
+            .then(function(result) {
                 return Project.destroy({
                     where: {
-                        id: req.body.ProjectId
+                        id: data.id
                     }
                 })
             })
@@ -60,11 +79,12 @@ class Controller {
                 return res.status(201).json(payload)
             })
             .catch(function(err) {
-                return err
+                console.log(err)
+                next(err)
             })
     }
 
-    static addFriend(req, res, next) { 
+    static addFriend(req, res, next) {  //Done And Tested
         let user;
         User.findOne({
             where: {
@@ -73,11 +93,14 @@ class Controller {
         })
             .then(function(result) {
                 if(result) {
-                    user = result
-                    return ProjectUser.Create({
-                        UserId: user.id,
-                        ProjectId: req.body.ProjectId
-                    })
+                    user = result.dataValues
+                    console.log(user)
+                   return ProjectUser.findOne({
+                       where: {
+                           ProjectId: req.body.ProjectId,
+                           UserId: user.id
+                       }
+                   })
                 }
                 else {
                     let err = {
@@ -87,38 +110,94 @@ class Controller {
                 }
             })
             .then(function(result) {
+                console.log(result)
+                if(result !== null) {
+                    let err = {
+                        msg: 'User Already Exist!!'
+                    }
+                    throw err
+                }
+                else {
+                    return ProjectUser.create({
+                        UserId: user.id,
+                        ProjectId: req.body.ProjectId
+                    })
+                }
+            })
+            .then(function(result) {
                 let payload = {
                     msg: 'Successfully Added!!'
                 }
                 return res.status(201).json(payload)
             })
             .catch(function(err) {
+                console.log(err)
                 next(err)
             })
     }
 
-    static deleteFriend(req,res, next) {
-        ProjectUser.destroy({
+    static deleteFriend(req,res, next) { //Done And Tested
+        let user
+        User.findOne({
             where: {
-                UserId: req.body.UserId,
-                ProjectId: req.body.ProjectId
+                Email: req.body.Email
             }
         })
+            .then(function(result) {
+                console.log('masuk user find one')
+                console.log(result)
+                if(result == null) {
+                    console.log('masuk else null')
+                    let err = {
+                        msg: 'User Does not Exist'
+                    }
+                    throw err
+                }
+                else {
+                    user = result.dataValues
+                    console.log('masuk if result not null')
+                    return ProjectUser.destroy({
+                        where: {
+                            UserId: user.id,
+                            ProjectId: req.body.ProjectId
+                        }
+                    })
+                    
+                }
+            })
             .then(function(result) {
                 let payload = {
                     msg: 'Successfully Removed the said Email'
                 }
                 return res.status(201).json(payload)
             })
+            .catch(function(err) {
+                console.log(err)
+                next(err)
+            })
     }
 
-    static getTodo(req, res, next) {
+    static getTodo(req, res, next) { //Done And Tested
         Project.findOne({
             where: {
-                ProjectId: req.body.ProjectId
+                id: req.body.ProjectId
             },
-            include: ['Todo']
         })
+            .then(function(result) {
+                if(result == null) {
+                    let err = {
+                        msg: 'Project Does Not Exist'
+                    }
+                    throw err
+                }
+                else {
+                    return Todo.findAll({
+                        where: {
+                            ProjectId: req.body.ProjectId
+                        }
+                    })
+                }
+            })
             .then(function(result) {
                 return res.status(200).json(result)
             })
@@ -128,15 +207,31 @@ class Controller {
 
     }
 
-    static addTodo(req, res, next) {
+    static addTodo(req, res, next) { //Done And Tested
         const { Title, Content, DueDate, Status, ProjectId} = req.body
-        Todo.create({
-            Title,
-            Content,
-            DueDate,
-            Status,
-            ProjectId
+
+        Project.findOne({
+            where: {
+                id: ProjectId
+            }
         })
+            .then(function(result) {
+                if(result !== null) {
+                    return Todo.create({
+                        Title,
+                        Content,
+                        DueDate,
+                        Status,
+                        ProjectId
+                    })
+                }
+                else {
+                    let err = {
+                        msg: 'Project Does Not Exist'
+                    }
+                    throw err
+                }
+            })
             .then(function(result) {
                 let payload = {
                     msg: 'Successfully Created',
@@ -144,10 +239,13 @@ class Controller {
                 }
                 return res.status(201).json(payload)
             })
+            .catch(function(err) {
+                next(err)
+            })
 
     }
 
-    static updateTodo(req, res, next) {
+    static updateTodo(req, res, next) { //Done And Tested
         const { Title, Content, DueDate, Status, ProjectId} = req.body
         Todo.update({
             Title,
@@ -173,12 +271,29 @@ class Controller {
         
     }
 
-    static deleteTodo(req, res, next) {
-        Todo.destroy({
+    static deleteTodo(req, res, next) { //Done And Tested
+
+        Todo.findOne({
             where: {
                 id: req.params.id
             }
         })
+            .then(function(result) {
+                if(result !== null) {
+                    return Todo.destroy({
+                        where: {
+                            id: req.params.id
+                        }
+                    })
+                }
+                else {
+                    let err = {
+                        msg: 'Todo Does Not Exist'
+                    }
+                    throw err
+                }
+            })
+        
             .then(function(result) {
                 let payload = {
                     msg: 'Successfully Deleted'
