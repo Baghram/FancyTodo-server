@@ -247,28 +247,37 @@ class Controller {
 
     static updateTodo(req, res, next) { //Done And Tested
         const { Title, Content, DueDate, Status, ProjectId} = req.body
-        Todo.update({
-            Title,
-            Content,
-            DueDate,
-            Status,
-            ProjectId
-        }, {
-            where: {
-                id: req.params.id
+        let date = new Date(DueDate)
+        let today = new Date()
+        if(date < today) {
+            let err = {
+                msg: 'Cannot Less Than Today'
             }
-        })
-            .then(function(result) {
-                let payload = {
-                    msg: "Successfully Updated",
-                    data: result
+            throw err
+        }
+        else {
+            Todo.update({
+                Title,
+                Content,
+                DueDate,
+                Status,
+                ProjectId
+            }, {
+                where: {
+                    id: req.params.id
                 }
-                return res.status(201).json(payload)
             })
-            .catch(function(err) {
-                next(err)
-            })
-        
+                .then(function(result) {
+                    let payload = {
+                        msg: "Successfully Updated",
+                        data: result
+                    }
+                    return res.status(201).json(payload)
+                })
+                .catch(function(err) {
+                    next(err)
+                })
+        }   
     }
 
     static deleteTodo(req, res, next) { //Done And Tested

@@ -3,7 +3,16 @@ module.exports = (sequelize, DataTypes) => {
   const Todo = sequelize.define('Todo', {
     Title: DataTypes.STRING,
     Content: DataTypes.STRING,
-    DueDate: DataTypes.DATE,
+    DueDate: {
+      type:DataTypes.DATE,
+      validate: {
+        customValidator(value) {
+          if(value < Date.now()) {
+            throw new Error("Due Date Cannot Less Than Today")
+          }
+        }
+      }
+    } ,
     Status: DataTypes.BOOLEAN,
     ProjectId: DataTypes.INTEGER
   }, {});

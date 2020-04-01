@@ -1,9 +1,9 @@
-const jwt = require('jsonwebtoken')
 const {User} = require('../models')
+const decrypt = require('../helper/decrypt')
 
 module.exports = function(req, res, next) {
     let Access_Token = req.header('Access_Token')
-    let Authenticated = jwt.verify(Access_Token, process.env.SECRET)
+    let Authenticated = decrypt(Access_Token)
     console.log('masuk authentication')
     console.log(Authenticated)
     User.findOne({

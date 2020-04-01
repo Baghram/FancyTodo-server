@@ -29,7 +29,7 @@ class UserController {
                     message: 'Register Success!!',
                     Email: result.Email
                 }
-                res.status(201).json(msg)
+                return res.status(201).json(msg)
             })
             .catch(function(err) {
                 console.log(err.message)
@@ -66,7 +66,7 @@ class UserController {
                         Email: result.Email,
                         geolocation: geolocation
                     }
-                    res.status(200).json(payload)
+                    return res.status(200).json(payload)
                 }
                 else {
                     let err = {
