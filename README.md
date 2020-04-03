@@ -89,6 +89,53 @@ Code:400
 
 _____________________________________________________________________
 Title
+Google Login
+
+URL
+
+/user/googleLogin
+
+Method:
+
+POST
+
+URL Params
+
+-
+
+Required:
+
+-Headers: {
+    Access_Token: id_token(from googleUser.getAuthResponse().id_token on client)
+}
+
+Optional:
+
+-
+
+Data Params
+
+-
+
+Success Response:
+
+Code: 201
+Content: 
+{
+    "Access_Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OCwiRW1haWwiOiJ0ZXN0aW5nMUBtYWlsLmNvbSIsImlhdCI6MTU4NTU3Mjg5MCwiZXhwIjoxNTg1NTc2NDkwfQ.10ZoEx5rxsXbLF2I-aSkCPSvfYMXyHQsUrzk5xZDooA",(Expired in 1 Hour)
+    "Email": "testing1@mail.com"
+}
+
+Error Response:
+Code:400
+{
+    "type": "Bad request",
+    "message": "Error Messages"
+}
+
+
+_____________________________________________________________________
+Title
 GetProject
 
 URL

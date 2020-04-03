@@ -1,6 +1,7 @@
 const {ProjectUser} = require('../models')
 
 module.exports = function(req, res, next) {
+    console.log('masuk authorization')
     ProjectUser.findOne({
         where: {
             UserId: req.Authenticated,

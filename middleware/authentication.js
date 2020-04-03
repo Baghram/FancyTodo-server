@@ -13,6 +13,7 @@ module.exports = function(req, res, next) {
     })
         .then(function(result) {
             if(result !== null) {
+                console.log('masuk result not null')
                 req.Authenticated = result.id
                 return next()
             }

@@ -79,7 +79,6 @@ class Controller {
                 return res.status(201).json(payload)
             })
             .catch(function(err) {
-                console.log(err)
                 next(err)
             })
     }
@@ -94,7 +93,6 @@ class Controller {
             .then(function(result) {
                 if(result) {
                     user = result.dataValues
-                    console.log(user)
                    return ProjectUser.findOne({
                        where: {
                            ProjectId: req.body.ProjectId,
@@ -110,7 +108,6 @@ class Controller {
                 }
             })
             .then(function(result) {
-                console.log(result)
                 if(result !== null) {
                     let err = {
                         msg: 'User Already Exist!!'
@@ -131,7 +128,6 @@ class Controller {
                 return res.status(201).json(payload)
             })
             .catch(function(err) {
-                console.log(err)
                 next(err)
             })
     }
@@ -144,10 +140,7 @@ class Controller {
             }
         })
             .then(function(result) {
-                console.log('masuk user find one')
-                console.log(result)
                 if(result == null) {
-                    console.log('masuk else null')
                     let err = {
                         msg: 'User Does not Exist'
                     }
@@ -155,7 +148,6 @@ class Controller {
                 }
                 else {
                     user = result.dataValues
-                    console.log('masuk if result not null')
                     return ProjectUser.destroy({
                         where: {
                             UserId: user.id,
@@ -172,15 +164,17 @@ class Controller {
                 return res.status(201).json(payload)
             })
             .catch(function(err) {
-                console.log(err)
                 next(err)
             })
     }
 
     static getTodo(req, res, next) { //Done And Tested
+        let Todos;
+        let Members;
+        let ProjectId = req.body.ProjectId
         Project.findOne({
             where: {
-                id: req.body.ProjectId
+                id: ProjectId
             },
         })
             .then(function(result) {
@@ -193,13 +187,27 @@ class Controller {
                 else {
                     return Todo.findAll({
                         where: {
-                            ProjectId: req.body.ProjectId
+                            ProjectId: ProjectId
                         }
                     })
                 }
             })
             .then(function(result) {
-                return res.status(200).json(result)
+                Todos = result
+                return ProjectUser.findAll({
+                    where: {
+                        ProjectId: ProjectId
+                    },
+                    include: ['User']
+                })
+                // return res.status(200).json(result)
+
+            })
+            .then(function(result) {
+                Members = result
+                return res.status(200).json({
+                    Todos,Members
+                })
             })
             .catch(function(err) {
                 next(err)
@@ -281,7 +289,6 @@ class Controller {
     }
 
     static deleteTodo(req, res, next) { //Done And Tested
-
         Todo.findOne({
             where: {
                 id: req.params.id
