@@ -172,6 +172,7 @@ class Controller {
         let Todos;
         let Members;
         let ProjectId = req.body.ProjectId
+        let Dates = []
         Project.findOne({
             where: {
                 id: ProjectId
@@ -194,6 +195,14 @@ class Controller {
             })
             .then(function(result) {
                 Todos = result
+                // console.log(Todos.length)
+                for(let i = 0; i < Todos.length; i++) {
+                    let date = Todos[i].DueDate.toString().slice(4,15)
+                    console.log(date)
+                    Dates.push(date)
+                    date = ''
+                }
+                console.log(Todos[0])
                 return ProjectUser.findAll({
                     where: {
                         ProjectId: ProjectId
@@ -206,7 +215,7 @@ class Controller {
             .then(function(result) {
                 Members = result
                 return res.status(200).json({
-                    Todos,Members
+                    Todos,Members,Dates
                 })
             })
             .catch(function(err) {
